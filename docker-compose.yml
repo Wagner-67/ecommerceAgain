@@ -1,0 +1,57 @@
+services:
+    web:
+        build: .
+        working_dir: /var/www/html
+        volumes:
+            - ./:/var/www/html
+        ports:
+            - "8080:80"
+        depends_on:
+            - db
+        environment:
+            APACHE_DOCUMENT_ROOT: /var/www/html/public
+
+    db:
+        image: mariadb:10.5
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: e-commerce-project
+            MYSQL_USER: symfony
+            MYSQL_PASSWORD: symfony
+        ports:
+            - "3307:3306"
+        volumes:
+            - db_data:/var/lib/mysql
+
+    phpmyadmin:
+        image: phpmyadmin:5.2.1
+        restart: always
+        ports:
+            - "8081:80"
+        environment:
+            PMA_HOST: db
+            MYSQL_ROOT_PASSWORD: root
+            UPLOAD_LIMIT: 256M
+
+###> doctrine/doctrine-bundle ###
+    database:
+        image: postgres:${POSTGRES_VERSION:-16}-alpine
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB:-app}
+            POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-!ChangeMe!}"
+            POSTGRES_USER: ${POSTGRES_USER:-app}
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB:-app} -U ${POSTGRES_USER:-app}"]
+            timeout: 5s
+            retries: 5
+            start_period: 60s
+        volumes:
+            - database_data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+
+volumes:
+    db_data:
+###> doctrine/doctrine-bundle ###
+    database_data:
+###< doctrine/doctrine-bundle ###
