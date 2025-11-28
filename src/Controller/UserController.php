@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\DomainService\UserProfileService;
+use App\Listener\DomainListener\UserDeleteService;
+use App\Listener\DomainListener\UserUpdateService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Service\DomainService\UserRegistrationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,6 +36,37 @@ final class UserController extends AbstractController
         $user = $this->getUser();
 
         $result = $userProfileService->getProfile($userId, $user);
+
+        return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
+    }
+
+    #[Route('/api/user/{userId}', name: 'app_user_update', methods: ['PATCH'])]
+    public function userProfileUpdate(
+        string $userId,
+        Request $request,
+        UserUpdateService $userUpdateService,
+    ): JsonResponse {
+        
+        $user= $this->getUser();
+
+        $data = json_decode($request->getContent(), true);
+
+        $result = $userUpdateService->updateProfile($userId, $data, $user);
+
+        return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
+
+    }
+
+    #[Route('/api/user/{userId}', name: 'app_user_delete', methods: ['DELETE'])]
+    public function userDelete(
+        string $userId,
+        EntityManagerInterface $em,
+        UserDeleteService $userDeleteService,
+    ): JsonResponse {
+
+        $user = $this->getUser();
+
+        $result = $userDeleteService->deleteUser($userId, $user);
 
         return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
     }

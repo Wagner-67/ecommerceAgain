@@ -36,6 +36,9 @@ class UserProfileService
             'email' => $userEntity->getEmail(),
             'firstname' => $userEntity->getFirstname(),
             'lastname' => $userEntity->getLastname(),
+            'isVerified' => $userEntity->isVerified(),
+            'lastLoginAt' => $userEntity->getLastLoginAt()?->format('Y-m-d H:i:s'),
+            'createdAt' => $userEntity->getCreatedAt()->format('Y-m-d H:i:s'),
             'status' => 200
         ];
     }
