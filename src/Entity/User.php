@@ -66,6 +66,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $verifiedToken = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $deleteToken = null;
+
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $verifiedAt = null;
 
@@ -82,6 +85,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->createdAt = new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin'));
         $this->verifiedToken = Uuid::v4()->toRfc4122();
+        $this->deleteToken = Uuid::v4()->toRfc4122();
         $this->userId = Uuid::v4()->toRfc4122();
     }
 
@@ -239,6 +243,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastVerificationEmailSentAt(?\DateTimeImmutable $lastVerificationEmailSentAt): static
     {
         $this->lastVerificationEmailSentAt = $lastVerificationEmailSentAt;
+
+        return $this;
+    }
+
+    public function getDeleteToken(): ?string
+    {
+        return $this->deleteToken;
+    }
+
+    public function setDeleteToken(?string $deleteToken): static
+    {
+        $this->deleteToken = $deleteToken;
 
         return $this;
     }

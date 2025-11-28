@@ -47,7 +47,7 @@ final class UserController extends AbstractController
         UserUpdateService $userUpdateService,
     ): JsonResponse {
         
-        $user= $this->getUser();
+        $user = $this->getUser();
 
         $data = json_decode($request->getContent(), true);
 
@@ -61,12 +61,12 @@ final class UserController extends AbstractController
     public function userDelete(
         string $userId,
         EntityManagerInterface $em,
-        UserDeleteService $userDeleteService,
+        UserDeleteMail $userDeleteService,
     ): JsonResponse {
 
         $user = $this->getUser();
 
-        $result = $userDeleteService->deleteUser($userId, $user);
+        $result = $userDeleteMail->deleteUser($userId, $user);
 
         return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
     }

@@ -53,4 +53,26 @@ class EmailService
 
         $this->mailer->send($email);
     }
+
+    public function sendAccountDeletionEmail(string $toEmail, string $deleteUrl, string $firstname): void
+    {
+        $html = "
+            <html>
+                <body>
+                    <p>Hello {$username},</p>
+                    <p>Your account has been successfully deleted.</p>
+                    <p>If you did not request this, please contact our support team immediately.</p>
+                    <p>Best regards,<br/>The Team</p>
+                </body>
+            </html>
+        ";
+
+        $email = (new Email())
+            ->to($toEmail)
+            ->from('noreply@yourapp.com')
+            ->subject('Verify your email')
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
 }

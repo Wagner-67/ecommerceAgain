@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsEventListener]
 final class VerifiedListener
@@ -19,7 +20,8 @@ final class VerifiedListener
         private TokenStorageInterface $tokenStorage,
         private EntityManagerInterface $em,
         private RouterInterface $router,
-        private EmailService $emailService
+        private EmailService $emailService,
+        private MessageBusInterface $messageBus
     ) {}
 
 
@@ -29,7 +31,9 @@ final class VerifiedListener
         $currentRoute = $request->attributes->get('_route');
 
         $protectedRoutes = [
-            'api_login_check',
+            'app_user_read',
+            'app_user_update',
+            'app_user_delete',
         ];
 
         if (in_array($currentRoute, $protectedRoutes, true)) {
@@ -53,13 +57,15 @@ final class VerifiedListener
                 UrlGeneratorInterface::ABSOLUTE_URL
             );
 
-            $this->emailService->sendVerificationEmail(
-                $user->getEmail(),
-                $verificationUrl,
-                $user->getFirstname()
+            $this->messageBus->dispatch(
+                new SendVerificationEmailMessage(
+                    $user->getEmail(),
+                    $verificationUrl,
+                    $user->getFirstname()
+                )
             );
 
-            $user->setLastVerificationEmailSentAt(new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin')));
+            $user->setLastVerificationEmailSentAt(new \DateTimeImmutable('now'));
 
             $this->em->persist($user);
             $this->em->flush();
