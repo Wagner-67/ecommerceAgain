@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Listener\DomainListener;
+namespace App\Service\DomainService;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 
 class UserDeleteService
 {
@@ -10,24 +11,25 @@ class UserDeleteService
         private EntityManagerInterface $em,
     ) {}
 
-    public function deleteUser(string $userId, ?User $user): array
+    public function deleteUserByToken(string $deleteToken, ?User $user): array
     {
         if (!$user) {
             return ['error' => 'You are not authorized', 'status' => 401];
         }
 
-        if (!$userId) {
-            return ['error' => 'User ID is required', 'status' => 400];
+        if (!$deleteToken) {
+            return ['error' => 'Delete token is required', 'status' => 400];
         }
 
-        if ($user->getUserId() !== $userId) {
-            return ['error' => 'Access denied', 'status' => 403];
-        }
-
-        $userEntity = $this->em->getRepository(User::class)->findOneBy(['userId' => $userId]);
+        $userEntity = $this->em->getRepository(User::class)
+            ->findOneBy(['deleteToken' => $deleteToken]);
 
         if (!$userEntity) {
             return ['error' => 'User not found', 'status' => 404];
+        }
+
+        if ($userEntity->getId() !== $user->getId()) {
+            return ['error' => 'Access denied', 'status' => 403];
         }
 
         $this->em->remove($userEntity);

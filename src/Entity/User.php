@@ -63,10 +63,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $isVerified = false;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
     private ?string $verifiedToken = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
     private ?string $deleteToken = null;
 
     #[ORM\Column(nullable: true)]
@@ -85,7 +85,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->createdAt = new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin'));
         $this->verifiedToken = Uuid::v4()->toRfc4122();
-        $this->deleteToken = Uuid::v4()->toRfc4122();
         $this->userId = Uuid::v4()->toRfc4122();
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listener\DomainListener;
+namespace App\Service\DomainService;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;

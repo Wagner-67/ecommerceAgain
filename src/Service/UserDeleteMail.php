@@ -8,6 +8,7 @@ use Symfony\Component\Routing\RouterInterface;
 use App\Message\SendAccountDeletionEmailMessage;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Uid\Uuid;
 
 class UserDeleteMail
 {
@@ -18,7 +19,7 @@ class UserDeleteMail
         private MessageBusInterface $messageBus 
         ) {}
 
-        public function onUserDeleted(UserDeletedEvent $event)
+        public function deleteUser(UserDeletedEvent $event)
         {
             if(!$user) {
             return ['error' => 'You are not authorized', 'status' => 401];
@@ -38,17 +39,24 @@ class UserDeleteMail
                 return ['error' => 'User not found', 'status' => 404];
             }
 
+           
+            $deleteToken = Uuid::v4()->toRfc4122();
+            $userEntity->setDeleteToken($deleteToken);
+
+            $this->em->persist($userEntity);
+            $this->em->flush();
+
             $deleteUrl = $this->router->generate(
                 'api_account_deleted',
-                ['deleteToken' => $user->getDeleteToken()],
+                ['deleteToken' => $deleteToken],
                 UrlGeneratorInterface::ABSOLUTE_URL
             );
 
-            $this->messageBus->sendAccountDeletionEmail(
+            $this->messageBus->dispatch(
                 new SendAccountDeletionEmailMessage(
-                    $user->getEmail(),
+                    $userEntity->getEmail(),
                     $deleteUrl,
-                    $user->getFirstname()
+                    $userEntity->getFirstname()
                 )
             );
 

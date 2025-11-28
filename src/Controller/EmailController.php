@@ -54,6 +54,6 @@ final class EmailController extends AbstractController
 
         $result = $userDeleteService->deleteUserByToken($deleteToken, $user);
 
-        return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
+         return new JsonResponse($result['body'] ?? $result, $result['status'] ?? Response::HTTP_OK);
     }
 }

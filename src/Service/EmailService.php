@@ -14,7 +14,7 @@ class EmailService
         $html = "
             <html>
                 <body>
-                    <p>Dear {$forename},</p>
+                    <p>Dear {$firstname},</p>
                     <p>Please verify your email by clicking the link below:</p>
                     <p><a href=\"{$verificationUrl}\">Verify Email</a></p>
                     <p>Best regards,<br/>The Team</p>
@@ -36,7 +36,7 @@ class EmailService
         $html = "
             <html>
                 <body>
-                    <p>Dear {$forename},</p>
+                    <p>Dear {$firstname},</p>
                     <p>You can reset your password by clicking the link below:</p>
                     <p><a href=\"{$resetUrl}\">Reset Password</a></p>
                     <p>If you did not request a password reset, please ignore this email.</p>
@@ -59,9 +59,10 @@ class EmailService
         $html = "
             <html>
                 <body>
-                    <p>Hello {$username},</p>
-                    <p>Your account has been successfully deleted.</p>
-                    <p>If you did not request this, please contact our support team immediately.</p>
+                    <p>Dear {$firstname},</p>
+                    <p>You requested to delete your account. To confirm, please click the link below:</p>
+                    <p><a href=\"{$deleteUrl}\">Confirm Account Deletion</a></p>
+                    <p>If you did not request this, please ignore the email.</p>
                     <p>Best regards,<br/>The Team</p>
                 </body>
             </html>
@@ -70,7 +71,7 @@ class EmailService
         $email = (new Email())
             ->to($toEmail)
             ->from('noreply@yourapp.com')
-            ->subject('Verify your email')
+            ->subject('Confirm your account deletion')
             ->html($html);
 
         $this->mailer->send($email);
