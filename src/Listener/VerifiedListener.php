@@ -1,22 +1,27 @@
 <?php
 
-namespace App\Listener\DomainListener;
+namespace App\Listener;
 
 use App\Entity\User;
 use App\Service\EmailService;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 #[AsEventListener]
 final class VerifiedListener
 {
     public function __construct(
         private TokenStorageInterface $tokenStorage,
+        private EntityManagerInterface $em,
+        private RouterInterface $router,
+        private EmailService $emailService
     ) {}
+
 
     public function __invoke(ControllerEvent $event): void
     {
@@ -24,11 +29,10 @@ final class VerifiedListener
         $currentRoute = $request->attributes->get('_route');
 
         $protectedRoutes = [
-            'api_user_create',
-            'api_verify_email',
+            'api_login_check',
         ];
 
-        if (!in_array($currentRoute, $protectedRoutes, true)) {
+        if (in_array($currentRoute, $protectedRoutes, true)) {
             $this->checkUserVerification();
         }
     }
@@ -54,6 +58,11 @@ final class VerifiedListener
                 $verificationUrl,
                 $user->getFirstname()
             );
+
+            $user->setLastVerificationEmailSentAt(new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin')));
+
+            $this->em->persist($user);
+            $this->em->flush();
 
             throw new AccessDeniedHttpException(
                 'You need to verify your account. A verification link has been sent to your email.'
