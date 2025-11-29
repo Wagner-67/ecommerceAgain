@@ -9,13 +9,15 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Listener\DomainListener\UserDeleteService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use DateTimeImmutable;
+use DateTimeZone;
 
 final class EmailController extends AbstractController
 {
-    #[Route('/api/user/{verifyToken}', name: 'api_verify_email', methods: ['GET'])]
+    #[Route('/api/user/verify/{verifyToken}', name: 'api_verify_email', methods: ['GET'])]
     public function verifyEmail(
         string $verifyToken,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
     ): JsonResponse {
 
         if(!$verifyToken) {
@@ -25,7 +27,7 @@ final class EmailController extends AbstractController
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $user = $em->getRepository(User::class)->findOneBy(['verifyToken' => $verifyToken]);
+        $user = $em->getRepository(User::class)->findOneBy(['verifiedToken' => $verifyToken]);
 
         if (!$user) {
             return new JsonResponse([
@@ -35,7 +37,8 @@ final class EmailController extends AbstractController
         }
 
         $user->setIsVerified(true);
-        $user->setVerifyToken(null);
+        $user->setVerifiedToken(null);
+        $user->setVerifiedAt(new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin')));
         $em->persist($user);
         $em->flush();
 
@@ -43,11 +46,11 @@ final class EmailController extends AbstractController
 
     }
 
-    #[Route('/api/user/{deleteToken}', name: 'api_account_deleted', methods: ['GET'])]
+    #[Route('/api/user/delete/{deleteToken}', name: 'api_account_deleted', methods: ['GET'])]
     public function accountDeleted(
         string $deleteToken,
         EntityManagerInterface $em,
-        UserDeleteService $userDeleteService
+        UserDeleteService $userDeleteService,
     ): JsonResponse {
 
         $user = $this->getUser();

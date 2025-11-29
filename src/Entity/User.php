@@ -78,9 +78,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $lastVerificationEmailSentAt = null;
-
     public function __construct()
     {
         $this->createdAt = new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin'));
@@ -203,10 +200,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->verifiedToken;
     }
 
-    public function setVerifiedToken(string $verifiedToken): static
+    public function setVerifiedToken(?string $verifiedToken): static
     {
         $this->verifiedToken = $verifiedToken;
-
+        
         return $this;
     }
 
@@ -230,18 +227,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastLoginAt(\DateTimeImmutable $lastLoginAt): static
     {
         $this->lastLoginAt = $lastLoginAt;
-
-        return $this;
-    }
-
-    public function getLastVerificationEmailSentAt(): ?\DateTimeImmutable
-    {
-        return $this->lastVerificationEmailSentAt;
-    }
-
-    public function setLastVerificationEmailSentAt(?\DateTimeImmutable $lastVerificationEmailSentAt): static
-    {
-        $this->lastVerificationEmailSentAt = $lastVerificationEmailSentAt;
 
         return $this;
     }

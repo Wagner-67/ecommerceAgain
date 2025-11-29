@@ -42,8 +42,6 @@ class UserRegisteredEventListener
                 )
             );
 
-        $user->setLastVerificationEmailSentAt(new \DateTimeImmutable('now'));
-
         $this->em->persist($user);
         $this->em->flush();
 

@@ -18,7 +18,7 @@ final class UserController extends AbstractController
     #[Route('/api/user', name: 'app_user_create', methods: ['POST'])]
     public function userRegister(
         Request $request,
-        UserRegistrationService $userRegistrationService
+        UserRegistrationService $userRegistrationService,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         
@@ -27,10 +27,10 @@ final class UserController extends AbstractController
         return new JsonResponse($result, Response::HTTP_CREATED);
     }
 
-    #[Route('/api/user/{userId}', name: 'app_user_read', methods: ['GET'])]
+    #[Route('/api/user/profile/{userId}', name: 'app_user_read', methods: ['GET'])]
     public function userProfile(
         string $userId,
-        UserProfileService $userProfileService
+        UserProfileService $userProfileService,
     ): JsonResponse {
 
         $user = $this->getUser();
@@ -40,7 +40,7 @@ final class UserController extends AbstractController
         return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
     }
 
-    #[Route('/api/user/{userId}', name: 'app_user_update', methods: ['PATCH'])]
+    #[Route('/api/user/profile/{userId}', name: 'app_user_update', methods: ['PATCH'])]
     public function userProfileUpdate(
         string $userId,
         Request $request,
@@ -57,7 +57,7 @@ final class UserController extends AbstractController
 
     }
 
-    #[Route('/api/user/{userId}', name: 'app_user_delete', methods: ['DELETE'])]
+    #[Route('/api/user/profile/{userId}', name: 'app_user_delete', methods: ['DELETE'])]
     public function userDelete(
         string $userId,
         EntityManagerInterface $em,

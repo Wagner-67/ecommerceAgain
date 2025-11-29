@@ -10,8 +10,9 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use App\Message\SendVerificationEmailMessage;
 
 #[AsEventListener]
 final class VerifiedListener
@@ -25,7 +26,7 @@ final class VerifiedListener
     ) {}
 
 
-    public function __invoke(ControllerEvent $event): void
+    public function __invoke(ControllerEvent $event): void 
     {
         $request = $event->getRequest();
         $currentRoute = $request->attributes->get('_route');
@@ -65,7 +66,6 @@ final class VerifiedListener
                 )
             );
 
-            $user->setLastVerificationEmailSentAt(new \DateTimeImmutable('now'));
 
             $this->em->persist($user);
             $this->em->flush();
