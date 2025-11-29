@@ -53,7 +53,7 @@ class UserRegistrationService
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->eventDispatcher->dispatch(new UserRegisteredEvent($user));
+        $this->eventDispatcher->dispatch(new UserRegisteredEvent($user), UserRegisteredEvent::class);
 
         return [
             'body' => ['success' => true, 'message' => 'User registered successfully.'],
