@@ -59,4 +59,19 @@ final class EmailController extends AbstractController
 
          return new JsonResponse($result['body'] ?? $result, $result['status'] ?? Response::HTTP_OK);
     }
+
+    #[Route('/api/user/password{resetToken}', name: 'api_password_reset_confirm', methods: ['PATCH'])]
+    public function passwordResetConfirm(
+        string $resetToken,
+        Request $request,
+        EntityManagerInterface $em,
+        PasswordResetService $PasswordResetService,
+    ): JsonResponse {
+
+        $data = json_decode($request->getContent(), true);
+
+        $result = $PasswordResetService->setPassword($data);
+
+        return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
+    }
 }

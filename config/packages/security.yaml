@@ -41,9 +41,10 @@ security:
     access_control:
         # Allow public POST to /api/user (registration)
         - { path: '^/api/user$', roles: PUBLIC_ACCESS, methods: [POST] }
+        - { path: ^/api/user/verify, roles: PUBLIC_ACCESS }
         - { path: ^/api/token/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/api/verify, roles: PUBLIC_ACCESS }
-        # Protect other subpaths under /api/user/ (e.g. /api/user/{id})
+
         - { path: ^/api/user/, roles: ROLE_USER }
         
 

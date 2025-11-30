@@ -7,6 +7,14 @@ services:
         tags:
             - { name: kernel.event_listener, event: App\Event\UserRegisteredEvent, method: onUserRegistered }
 
+    App\Listener\DomainListener\PasswordResetRequestedEventListener:
+        tags:
+            - { name: kernel.event_listener, event: App\Event\PasswordResetRequestedEvent, method: onPasswordResetRequested }
+
+    App\Listener\DomainListener\UserDeletionRequestedEventListener:
+        tags:
+            - { name: kernel.event_listener, event: App\Event\UserDeletionRequestEvent, method: onUserDeletionRequested }
+
     App\:
         resource: '../src/'
         exclude:

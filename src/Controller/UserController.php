@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Service\PasswordResetMail;
+use App\Service\PasswordResetService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,6 +13,7 @@ use App\Listener\DomainListener\UserDeleteService;
 use App\Listener\DomainListener\UserUpdateService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Service\DomainService\UserRegistrationService;
+use App\Service\DomainService\PasswordResetMailService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class UserController extends AbstractController
@@ -66,7 +69,21 @@ final class UserController extends AbstractController
 
         $user = $this->getUser();
 
-        $result = $userDeleteMail->deleteUser($userId, $user);
+        $result = $userDeleteService->deleteUser($userId, $user);
+
+        return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
+    }
+    
+    #[Route('/api/user/password', name: 'app_user_password_reset', methods: ['POST'])]
+    public function passwordReset(
+        Request $request,
+        PasswordResetMail $PasswordResetMail,
+        EntityManagerInterface $em,
+    ): JsonResponse {
+
+        $data = json_decode($request->getContent(), true);
+
+        $result = $PasswordResetMail->SendResetMail($data);
 
         return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
     }

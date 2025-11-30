@@ -2,67 +2,50 @@
 
 namespace App\Service;
 
-use App\Service\EmailService;
+use App\Entity\User;
+use App\Event\UserDeletionRequestedEvent;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Routing\RouterInterface;
-use App\Message\SendAccountDeletionEmailMessage;
-use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class UserDeleteMail
 {
     public function __construct(
-        private RouterInterface $router,
-        private EmailService $emailService,
         private EntityManagerInterface $em,
-        private MessageBusInterface $messageBus 
-        ) {}
+        private EventDispatcherInterface $eventDispatcher
+    ) {}
 
-        public function deleteUser(UserDeletedEvent $event)
-        {
-            if(!$user) {
+    public function deleteUser(string $userId, User $currentUser): array
+    {
+        if (!$currentUser) {
             return ['error' => 'You are not authorized', 'status' => 401];
-            }
-
-            if(!$userId) {
-                return ['error' => 'User ID is required', 'status' => 400];
-            }
-
-            if($user->getUserId() !== $userId) {
-                return ['error' => 'Access denied', 'status' => 403];
-            }
-            
-            $userEntity = $this->em->getRepository(User::class)->findOneBy(['userId' => $userId]);
-
-            if(!$userEntity) {
-                return ['error' => 'User not found', 'status' => 404];
-            }
-
-           
-            $deleteToken = Uuid::v4()->toRfc4122();
-            $userEntity->setDeleteToken($deleteToken);
-
-            $this->em->persist($userEntity);
-            $this->em->flush();
-
-            $deleteUrl = $this->router->generate(
-                'api_account_deleted',
-                ['deleteToken' => $deleteToken],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            );
-
-            $this->messageBus->dispatch(
-                new SendAccountDeletionEmailMessage(
-                    $userEntity->getEmail(),
-                    $deleteUrl,
-                    $userEntity->getFirstname()
-                )
-            );
-
-            return [
-                'body' => ['success' => true, 'message' => 'Account deletion email sent successfully.'],
-                'status' => 200
-            ];
         }
+
+        if (!$userId) {
+            return ['error' => 'User ID is required', 'status' => 400];
+        }
+
+        if ($currentUser->getUserId() !== $userId) {
+            return ['error' => 'Access denied', 'status' => 403];
+        }
+        
+        $userEntity = $this->em->getRepository(User::class)->findOneBy(['userId' => $userId]);
+
+        if (!$userEntity) {
+            return ['error' => 'User not found', 'status' => 404];
+        }
+
+        $deleteToken = Uuid::v4()->toRfc4122();
+        $userEntity->setDeleteToken($deleteToken);
+
+        $this->em->persist($userEntity);
+        $this->em->flush();
+
+        $this->eventDispatcher->dispatch(new UserDeletionRequestedEvent($userEntity), UserDeletionRequestedEvent::class);
+
+        return [
+            'body' => ['success' => true, 'message' => 'Account deletion email sent successfully.'],
+            'status' => 200
+        ];
+    }
 }

@@ -21,18 +21,18 @@ class UserDeleteService
             return ['error' => 'Delete token is required', 'status' => 400];
         }
 
-        $userEntity = $this->em->getRepository(User::class)
+        $user = $this->em->getRepository(User::class)
             ->findOneBy(['deleteToken' => $deleteToken]);
 
-        if (!$userEntity) {
+        if (!$user) {
             return ['error' => 'User not found', 'status' => 404];
         }
 
-        if ($userEntity->getId() !== $user->getId()) {
+        if ($user->getDeleteToken() !== $deleteToken) {
             return ['error' => 'Access denied', 'status' => 403];
         }
 
-        $this->em->remove($userEntity);
+        $this->em->remove($user);
         $this->em->flush();
 
         return [

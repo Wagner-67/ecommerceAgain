@@ -64,6 +64,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $isVerified = false;
 
     #[ORM\Column(length: 255, unique: true, nullable: true)]
+    private ?string $passwordResetToken = null;
+
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
     private ?string $verifiedToken = null;
 
     #[ORM\Column(length: 255, unique: true, nullable: true)]
@@ -239,6 +242,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDeleteToken(?string $deleteToken): static
     {
         $this->deleteToken = $deleteToken;
+
+        return $this;
+    }
+
+    public function getPasswordResetToken(): ?string
+    {
+        return $this->passwordResetToken;
+    }
+
+    public function setPasswordResetToken(?string $passwordResetToken): static
+    {
+        $this->passwordResetToken = $passwordResetToken;
 
         return $this;
     }
