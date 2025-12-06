@@ -13,8 +13,9 @@ class UserDeleteService
 
     public function deleteUserByToken(string $deleteToken, ?User $user): array
     {
-        if (!$user) {
-            return ['error' => 'You are not authorized', 'status' => 401];
+
+        if (!$this->security->isGranted('ROLE_USER', $user)) {
+            throw new AccessDeniedException('Admin access required');
         }
 
         if (!$deleteToken) {

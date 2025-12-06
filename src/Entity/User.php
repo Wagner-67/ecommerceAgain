@@ -7,7 +7,10 @@ use DateTimeImmutable;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -57,8 +60,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $role = 'ROLE_USER';
+    /**
+     * @var array<string>
+     */
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
 
     #[ORM\Column]
     private ?bool $isVerified = false;
@@ -81,11 +87,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    /**
+     * @var Collection<int, Product>
+     */
+    #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'createdBy')]
+    private Collection $products;
+
     public function __construct()
     {
         $this->createdAt = new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin'));
         $this->verifiedToken = Uuid::v4()->toRfc4122();
         $this->userId = Uuid::v4()->toRfc4122();
+        $this->roles = ['ROLE_USER'];
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -167,17 +181,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return ['ROLE_USER'];
+        $roles = $this->roles;
+        if (!in_array('ROLE_USER', $roles, true)) {
+            $roles[] = 'ROLE_USER';
+        }
+        
+        return array_unique($roles);
     }
 
-    public function setRole(string $role): static
+    public function setRoles(array $roles): static
     {
-        $this->role = $role;
-
+        if (!in_array('ROLE_USER', $roles, true)) {
+            $roles[] = 'ROLE_USER';
+        }
+        
+        $this->roles = array_unique($roles);
         return $this;
     }
 
-        public function eraseCredentials(): void
+    public function addRole(string $role): static
+    {
+        if (!in_array($role, $this->roles, true)) {
+            $this->roles[] = $role;
+        }
+        
+        return $this;
+    }
+
+    public function removeRole(string $role): static
+    {
+
+        if ($role === 'ROLE_USER') {
+            return $this;
+        }
+        
+        $key = array_search($role, $this->roles, true);
+        if ($key !== false) {
+            unset($this->roles[$key]);
+            $this->roles = array_values($this->roles);
+        }
+        
+        return $this;
+    }
+
+    public function eraseCredentials(): void
     {
     }
 
@@ -254,6 +301,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPasswordResetToken(?string $passwordResetToken): static
     {
         $this->passwordResetToken = $passwordResetToken;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): static
+    {
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getCreatedBy() === $this) {
+                $product->setCreatedBy(null);
+            }
+        }
 
         return $this;
     }

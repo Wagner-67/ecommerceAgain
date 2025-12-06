@@ -15,9 +15,11 @@ class UserUpdateService
 
     public function updateProfile(string $userId, array $data): array
     {
-        if(!$user) {
-            return ['error' => 'You are not authorized', 'status' => 401];
+
+        if (!$this->security->isGranted('ROLE_USER', $user)) {
+            throw new AccessDeniedException('Admin access required');
         }
+
 
         if(!$userId) {
             return ['error' => 'User ID is required', 'status' => 400];

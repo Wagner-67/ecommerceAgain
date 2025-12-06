@@ -24,7 +24,6 @@ final class ApiRateLimiterListener
     {
         $request = $event->getRequest();
 
-        // Apply limiter to any request under the /api path
         $path = $request->getPathInfo();
         if (!str_starts_with($path, '/api')) {
             return;

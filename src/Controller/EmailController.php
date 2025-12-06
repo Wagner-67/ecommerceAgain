@@ -14,7 +14,7 @@ use DateTimeZone;
 
 final class EmailController extends AbstractController
 {
-    #[Route('/api/user/verify/{verifyToken}', name: 'api_verify_email', methods: ['GET'])]
+    #[Route('/api/user/verify/{verifyToken}', name: 'app_verify_email', methods: ['GET'])]
     public function verifyEmail(
         string $verifyToken,
         EntityManagerInterface $em,
@@ -46,7 +46,7 @@ final class EmailController extends AbstractController
 
     }
 
-    #[Route('/api/user/delete/{deleteToken}', name: 'api_account_deleted', methods: ['GET'])]
+    #[Route('/api/user/delete/{deleteToken}', name: 'app_account_deleted', methods: ['GET'])]
     public function accountDeleted(
         string $deleteToken,
         EntityManagerInterface $em,
@@ -60,7 +60,7 @@ final class EmailController extends AbstractController
          return new JsonResponse($result['body'] ?? $result, $result['status'] ?? Response::HTTP_OK);
     }
 
-    #[Route('/api/user/password{resetToken}', name: 'api_password_reset_confirm', methods: ['PATCH'])]
+    #[Route('/api/user/password{resetToken}', name: 'app_password_reset_confirm', methods: ['PATCH'])]
     public function passwordResetConfirm(
         string $resetToken,
         Request $request,
