@@ -14,10 +14,13 @@ class UserProfileService
     public function getProfile(string $userId, ?User $user): ?array
     {
 
-        if (!$this->security->isGranted('ROLE_USER', $user)) {
-            throw new AccessDeniedException('Admin access required');
+        if (!$user) {
+            throw new AccessDeniedException('Authentication required');
         }
 
+        if (!$this->security->isGranted('ROLE_USER', $user)) {
+            throw new AccessDeniedException('USER access required');
+        }
 
         if (!$userId) {
             return ['error' => 'User ID is required', 'status' => 400];

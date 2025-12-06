@@ -23,6 +23,7 @@ final class UserController extends AbstractController
         Request $request,
         UserRegistrationService $userRegistrationService,
     ): JsonResponse {
+        
         $data = json_decode($request->getContent(), true);
         
         $result = $userRegistrationService->register($data);

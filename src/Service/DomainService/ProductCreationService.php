@@ -3,6 +3,7 @@
 namespace App\Service\DomainService;
 
 use App\Entity\User;
+use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Service\DomainService\ProductCreationService;
@@ -22,17 +23,22 @@ class ProductCreationService
     public function create(array $data, ?User $user): array
     {
 
-        $token = $this->tokenStorage->getToken();
+        if (!$user) {
+            throw new AccessDeniedException('Authentication required');
+        }
         
         if (!$this->security->isGranted('ROLE_ADMIN', $user)) {
             throw new AccessDeniedException('Admin access required');
         }
 
-        /*
-        product new 
-        set ...
-        */
-
+        $product = new Product;
+        $product->setTitel($data['title']);
+        $product->setDescription($data['description']);
+        $prodcut->setPrice($data['price']);
+        $product->setStock($data['stock']);
+        $product->setIsActive($data['isActive']);
+        $product->setCreatedBy($user)
+        
         $errors = $this->validator->validate($product);
         if (count($errors) > 0) {
             $errorMessages = [];

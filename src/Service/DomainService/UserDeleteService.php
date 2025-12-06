@@ -14,8 +14,12 @@ class UserDeleteService
     public function deleteUserByToken(string $deleteToken, ?User $user): array
     {
 
+        if (!$user) {
+            throw new AccessDeniedException('Authentication required');
+        }
+
         if (!$this->security->isGranted('ROLE_USER', $user)) {
-            throw new AccessDeniedException('Admin access required');
+            throw new AccessDeniedException('access required');
         }
 
         if (!$deleteToken) {
