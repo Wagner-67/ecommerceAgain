@@ -2,12 +2,13 @@
 
 namespace App\Service\DomainService;
 
+use App\Entity\Cart;
 use App\Entity\User;
+use App\Event\UserRegisteredEvent;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use App\Event\UserRegisteredEvent;
 
 class UserRegistrationService
 {
@@ -34,6 +35,8 @@ class UserRegistrationService
             ];
         }
 
+
+
         $user = new User();
         $user->setEmail($data['email']);
         $user->setFirstname($data['firstname']);
@@ -41,6 +44,10 @@ class UserRegistrationService
         $user->setPassword(
             $this->passwordHasher->hashPassword($user, $data['password'])
         );
+
+        $cart = new Cart();
+        $cart->setUser($user);
+        $user->setCart($cart);
 
         $violations = $this->validator->validate($user);
         if (count($violations) > 0) {
@@ -50,6 +57,7 @@ class UserRegistrationService
             ];
         }
 
+        $this->em->persist($cart); 
         $this->em->persist($user);
         $this->em->flush();
 

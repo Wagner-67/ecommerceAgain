@@ -6,10 +6,8 @@ use App\Entity\User;
 use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use App\Service\DomainService\ProductCreationService;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ProductCreationService
 {
@@ -31,13 +29,13 @@ class ProductCreationService
             throw new AccessDeniedException('Admin access required');
         }
 
-        $product = new Product;
-        $product->setTitel($data['title']);
-        $product->setDescription($data['description']);
-        $prodcut->setPrice($data['price']);
-        $product->setStock($data['stock']);
-        $product->setIsActive($data['isActive']);
-        $product->setCreatedBy($user)
+        $product = new Product();
+        $product->setTitel($data['title'] ?? '');
+        $product->setDescription($data['description'] ?? '');
+        $product->setPrice((string) ($data['price'] ?? '0'));
+        $product->setStock((int) ($data['stock'] ?? 0));
+        $product->setIsActive((bool) ($data['isActive'] ?? false));
+        $product->setCreatedBy($user);
         
         $errors = $this->validator->validate($product);
         if (count($errors) > 0) {

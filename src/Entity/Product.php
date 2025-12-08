@@ -9,13 +9,14 @@ use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\User;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 class Product
 {
 
-    private function generateSlug(string $title): stream_set_blocking
+    private function generateSlug(string $title): string
     {
 
         $slug = mb_strtolower($title, 'UTF-8');
@@ -41,7 +42,7 @@ class Product
     public function updateSlug(): void
     {
 
-        if($this->titel) {
+        if ($this->titel) {
             $this->slug = $this->generateSlug($this->titel);
         }
 
@@ -128,7 +129,7 @@ class Product
     private ?bool $isActive = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
-    private ?user $createdBy = null;
+    private ?User $createdBy = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -232,12 +233,12 @@ class Product
         return $this;
     }
 
-    public function getCreatedBy(): ?user
+    public function getCreatedBy(): ?User
     {
         return $this->createdBy;
     }
 
-    public function setCreatedBy(?user $createdBy): static
+    public function setCreatedBy(?User $createdBy): static
     {
         $this->createdBy = $createdBy;
 

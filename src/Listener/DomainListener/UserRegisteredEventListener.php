@@ -29,7 +29,7 @@ class UserRegisteredEventListener
         $user = $event->getUser();
 
         $verificationUrl = $this->router->generate(
-            'api_verify_email',
+            'app_verify_email',
             ['verifyToken' => $user->getVerifiedToken()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
