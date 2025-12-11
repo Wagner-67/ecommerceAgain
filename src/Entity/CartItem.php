@@ -32,8 +32,9 @@ class CartItem
     #[ORM\ManyToOne(inversedBy: 'cartItems')]
     private ?cart $cart = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?product $product = null;
+    #[ORM\ManyToOne(targetEntity: Product::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Product $product = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0)]
     private ?string $price = null;

@@ -19,10 +19,13 @@ final class ProductController extends AbstractController
         Request $request,
         ProductCreationService $productCreationService
     ): JsonResponse {
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $user = $this->getUser();
 
-        $data = json_decode($request->getContent(), true) ?: [];
-
+        $data = json_decode($request->getContent(), true);
+        
         $result = $productCreationService->create($data, $user);
 
         $status = $result['status'] ?? Response::HTTP_CREATED;
@@ -52,6 +55,9 @@ final class ProductController extends AbstractController
         string $productId,
         ProductEditService $productEditService
     ): JsonResponse {
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $user = $this->getUser();
 
         $data = json_decode($request->getContent(), true) ?: [];
@@ -69,6 +75,9 @@ final class ProductController extends AbstractController
         string $productId,
         ProductDeleteService $productDeleteService
     ): JsonResponse {
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         $user = $this->getUser();
 
         $result = $productDeleteService->delete($productId, $user);

@@ -37,6 +37,8 @@ final class UserController extends AbstractController
         UserProfileService $userProfileService,
     ): JsonResponse {
 
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
         $user = $this->getUser();
 
         $result = $userProfileService->getProfile($userId, $user);
@@ -50,6 +52,8 @@ final class UserController extends AbstractController
         Request $request,
         UserUpdateService $userUpdateService,
     ): JsonResponse {
+
+        $this->denyAccessUnlessGranted('ROLE_USER');
         
         $user = $this->getUser();
 
@@ -67,6 +71,8 @@ final class UserController extends AbstractController
         EntityManagerInterface $em,
         UserDeleteMail $userDeleteService,
     ): JsonResponse {
+
+        $this->denyAccessUnlessGranted('ROLE_USER');
 
         $user = $this->getUser();
 
