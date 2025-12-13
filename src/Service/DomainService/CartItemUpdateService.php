@@ -33,7 +33,6 @@ class CartItemUpdateService
             return ['error' => 'Not authorized', 'status' => 403];
         }
 
-
         if (isset($data['quantity']) && $data['quantity'] > 0) {
 
             $cartItem->setQuantity($data['quantity']);

@@ -64,4 +64,19 @@ final class CartController extends AbstractController
         
         return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
     }
+
+    #[Route('api/cart-items/{cartItemId}', name: 'app_cart_item_delete', methods: ['DELETE'])]
+    public function deleteCartItem(
+        string $cartItemId,
+        CartItemDeleteService $cartItemDeleteService,
+    ): JsonResponse {
+
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        
+        $user = $this->getUser();
+
+        $result = $cartItemDeleteService->deleteCartItem($user, $cartItemId);
+
+        return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
+    }
 }
