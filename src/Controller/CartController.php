@@ -50,4 +50,18 @@ final class CartController extends AbstractController
 
         return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
     }
+
+    #[Route('/api/cart', name: 'app_cart_read', methods: ['GET'])]
+    public function readCart(
+        CartListService $cartListService,
+    ): JsonResponse {
+
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        $user = $this->getUser();
+
+        $result = $cartListService->listCart($user);
+        
+        return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
+    }
 }

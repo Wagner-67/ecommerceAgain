@@ -15,6 +15,10 @@ services:
         tags:
             - { name: kernel.event_listener, event: App\Event\UserDeletionRequestEvent, method: onUserDeletionRequested }
 
+    App\Listener\DomainListener\CartCalculationSubscriber:
+        tags:
+            - { name: 'kernel.event_listener', event: 'cart.calculated', method: 'onCartCalculated' }
+
     App\:
         resource: '../src/'
         exclude:
