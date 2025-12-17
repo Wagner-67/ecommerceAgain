@@ -16,7 +16,7 @@ class CartItemDeleteService
     public function deleteCartItem(?User $user, string $cartItemId): array
     {
         if(!$cartItemId) {
-            return ['error' => 'cartItemId is requred']
+            return ['error' => 'cartItemId is requred'];
         }
 
         $cartItem = $this->em->getRepository(CartItem::class)
@@ -31,7 +31,7 @@ class CartItemDeleteService
             return ['error' => 'Not authorized', 'status' => 403];
         }
 
-        $this->em->remove($cartItem)
+        $this->em->remove($cartItem);
         $this->em->flush();
 
         return ['success' => 'Item Removed from cart', 'status' => 200];

@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Service\DomainService\UserRegistrationService;
 use App\Service\DomainService\PasswordResetMailService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Cookie;
 
 final class UserController extends AbstractController
 {
@@ -31,19 +32,16 @@ final class UserController extends AbstractController
         return new JsonResponse($result, Response::HTTP_CREATED);
     }
 
-    #[Route('/api/user/profile/{userId}', name: 'app_user_read', methods: ['GET'])]
-    public function userProfile(
-        string $userId,
-        UserProfileService $userProfileService,
-    ): JsonResponse {
-
+    #[Route('/api/user/me', name: 'app_user_me', methods: ['GET'])]
+    public function me(UserProfileService $userProfileService): JsonResponse
+    {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
         $user = $this->getUser();
 
-        $result = $userProfileService->getProfile($userId, $user);
+        $result = $userProfileService->getProfile($user);
 
-        return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
+        return new JsonResponse($result);
     }
 
     #[Route('/api/user/profile/{userId}', name: 'app_user_update', methods: ['PATCH'])]
@@ -94,4 +92,32 @@ final class UserController extends AbstractController
 
         return new JsonResponse($result, $result['status'] ?? Response::HTTP_OK);
     }
+
+    #[Route('/api/token/invalidate', name: 'api_token_invalidate', methods: ['POST'])]
+    public function invalidateToken(
+        EntityManagerInterface $em,
+        UserRepository $userRepo,
+        Request $request
+    ): JsonResponse {
+        $user = $this->getUser();
+
+        if ($user) {
+            $refreshTokens = $em->getRepository(RefreshToken::class)
+                ->findBy(['user' => $user]);
+
+            foreach ($refreshTokens as $token) {
+                $em->remove($token);
+            }
+
+            $em->flush();
+        }
+
+        $response = new JsonResponse(['success' => true]);
+
+        $response->headers->clearCookie('refreshToken', '/', null, false, true, false, 'lax');
+
+        return $response;
+    }
+
+
 }

@@ -12,3 +12,4 @@ api_refresh_token:
 
 api_token_invalidate:
     path: /api/token/invalidate
+    methods: [POST]

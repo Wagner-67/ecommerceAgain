@@ -25,19 +25,16 @@ final class VerifiedListener
         private MessageBusInterface $messageBus
     ) {}
 
-
     public function __invoke(ControllerEvent $event): void 
     {
         $request = $event->getRequest();
         $currentRoute = $request->attributes->get('_route');
 
-        $protectedRoutes = [
-            'app_user_read',
-            'app_user_update',
-            'app_user_delete',
+        $excludedRoutes = [
+            
         ];
 
-        if (in_array($currentRoute, $protectedRoutes, true)) {
+        if (!in_array($currentRoute, $excludedRoutes, true)) {
             $this->checkUserVerification();
         }
     }
@@ -65,7 +62,6 @@ final class VerifiedListener
                     $user->getFirstname()
                 )
             );
-
 
             $this->em->persist($user);
             $this->em->flush();

@@ -34,8 +34,8 @@ class CartListService
         $event = new CartCalculatedEvent($user, $items);
         $this->eventDispatcher->dispatch($event, CartCalculatedEvent::NAME);
 
-        $userCart->setTotalPrice($event->getTotalPrice())
-        $userCart->setTotalItems($event->getTotalItems())
+        $userCart->setTotalPrice($event->getTotalPrice());
+        $userCart->setTotalItems($event->getTotalItems());
 
         $this->em->persist($userCart);
         $this->em->flush();
