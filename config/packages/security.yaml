@@ -41,6 +41,7 @@ security:
         - { path: '^/api/login_check', roles: PUBLIC_ACCESS }
         - { path: ^/api/token/invalidate, roles: PUBLIC_ACCESS }
         - { path: '^/api/user$', roles: PUBLIC_ACCESS, methods: [POST] }
+        - { path: '^/api/user/preference', role: PUBLIC_ACCESS }
         - { path: ^/api/user/verify, roles: PUBLIC_ACCESS }
         - { path: ^/api/token/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/api/verify, roles: PUBLIC_ACCESS }

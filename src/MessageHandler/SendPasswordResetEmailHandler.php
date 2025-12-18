@@ -4,14 +4,11 @@ namespace App\MessageHandler;
 
 use App\Service\EmailService;
 use App\Message\SendPasswordResetEmailMessage;
-use App\Message\SendAccountDeletionEmailMessage;
-use App\MessageHandler\SendPasswordResetEmailHandler;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class SendPasswordResetEmailHandler
+class SendPasswordResetEmailHandler
 {
-
     public function __construct(
         private EmailService $emailService
     ) {}
@@ -24,5 +21,4 @@ final class SendPasswordResetEmailHandler
             $message->firstname
         );
     }
-
 }

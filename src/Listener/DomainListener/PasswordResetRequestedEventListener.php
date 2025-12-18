@@ -3,13 +3,12 @@
 namespace App\Listener\DomainListener;
 
 use App\Event\PasswordResetRequestedEvent;
+use App\Message\SendPasswordResetEmailMessage;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
-use App\Listener\DomainListener\PasswordResetListener;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-#[AsEventListener(event: PasswordResetRequestedEvent::class, method: 'onPasswordResetRequested')]
-class PasswordResetListener
+class PasswordResetRequestedEventListener 
 {
     public function __construct(
         private RouterInterface $router,
@@ -28,7 +27,7 @@ class PasswordResetListener
         );
 
         $this->messageBus->dispatch(
-            new SendPasswordResetEmail(
+            new SendPasswordResetEmailMessage(
                 $user->getEmail(),
                 $resetUrl,
                 $user->getFirstname()

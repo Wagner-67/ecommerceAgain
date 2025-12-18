@@ -7,19 +7,18 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Event\PasswordResetRequestedEvent;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Uid\Uuid; // ADD THIS IMPORT
 
 class PasswordResetMail
 {
     public function __construct(
-        EntityManagerInterface $em,
-        ValidatorInterface $validator,
-        EventDispatcherInterface $eventDispatcher
+        private EntityManagerInterface $em,
+        private ValidatorInterface $validator,
+        private EventDispatcherInterface $eventDispatcher
     ) {}
-
 
     public function SendResetMail(array $data): array
     {
-        
         if(empty($data['email'])) {
             return [
                 'body' => ['success' => false, 'errors' => 'Email is required.'],
@@ -49,7 +48,11 @@ class PasswordResetMail
         $this->em->persist($user);
         $this->em->flush();
 
-        $this->eventDispatcher->dispatch(new PasswordResetRequestedEvent($user), PasswordResetRequestedEvent::class);
+        // Dispatch the event
+        $this->eventDispatcher->dispatch(
+            new PasswordResetRequestedEvent($user), 
+            PasswordResetRequestedEvent::class
+        );
 
         return [
             'body' => ['success' => true, 'message' => 'Password reset mail sent successfully.'],

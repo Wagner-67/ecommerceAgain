@@ -3,15 +3,11 @@ services:
         autowire: true
         autoconfigure: true
 
-    App\Listener\DomainListener\UserRegisteredEventListener:
-        tags:
-            - { name: kernel.event_listener, event: App\Event\UserRegisteredEvent, method: onUserRegistered }
-
     App\Listener\DomainListener\PasswordResetRequestedEventListener:
         tags:
             - { name: kernel.event_listener, event: App\Event\PasswordResetRequestedEvent, method: onPasswordResetRequested }
 
-    App\Listener\DomainListener\UserDeletionRequestedEventListener:
+    App\Listener\DomainListener\UserDeletionListener:
         tags:
             - { name: kernel.event_listener, event: App\Event\UserDeletionRequestEvent, method: onUserDeletionRequested }
 
