@@ -1,7 +1,12 @@
+parameters:
+    stripe_secret_key: '%env(STRIPE_SECRET_KEY)%'
+
 services:
     _defaults:
         autowire: true
         autoconfigure: true
+        bind:
+            $stripeSecretKey: '%stripe_secret_key%'
 
     App\Listener\DomainListener\PasswordResetRequestedEventListener:
         tags:
