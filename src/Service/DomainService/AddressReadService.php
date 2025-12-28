@@ -18,7 +18,7 @@ class AddressReadService
     public function addAddress(?User $user): array
     {
 
-        $userAddress $user->getAddresses();
+        $userAddress = $user->getAddresses();
         $addressRepo = $this->em->getRepository(Address::class)->findBy(['user' => $userAddress]);
 
         $address = [];

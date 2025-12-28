@@ -53,7 +53,7 @@ final class AddressController extends AbstractController
     #[Route('/api/address', name: 'app_address_read', methods: ['GET'])]
     public function read(
         Request $request,
-        AddressReadService $addressReadService;
+        AddressReadService $addressReadService,
     ): Jsonresponse
     {
 
@@ -71,7 +71,7 @@ final class AddressController extends AbstractController
     public function update(
         string $id,
         Request $request,
-        AddressUpdateService $addressUpdateService;
+        AddressUpdateService $addressUpdateService,
     ): JsonResponse
     {
 
@@ -90,7 +90,7 @@ final class AddressController extends AbstractController
     #[Route('/api/address/{id}', name: 'app_addres_delete', methods: ['DELETE'])]
     public function delete(
         string $id,
-        AddressDeleteService $addressDeleteService;
+        AddressDeleteService $addressDeleteService,
     ): JsonResponse
     {
 

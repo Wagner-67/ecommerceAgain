@@ -20,11 +20,10 @@ enum AddressTypeEnum: string
     public function getLabel(): string
     {
         return match($this) {
-            self::HOME => 'Home Address',
-            self::WORK => 'Work Address',
+
             self::BILLING => 'Billing Address',
-            self::SHIPPING => 'Shipping Address',
-            self::OTHER => 'Other Address',
+            self::DeliveryAddress => 'Delivery Address',
+
         };
     }
 }

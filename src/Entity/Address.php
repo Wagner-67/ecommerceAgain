@@ -89,6 +89,7 @@ class Address
         $this->createdAt = new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin'));
         $this->updatedAt = new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin'));
         $this->addressType = [];
+        $this->orders = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
